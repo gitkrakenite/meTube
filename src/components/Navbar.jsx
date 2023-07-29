@@ -19,16 +19,7 @@ const Navbar = () => {
       }}
     >
       <Link to="/" style={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={logo}
-          alt="logo"
-          style={{
-            height: 48,
-            width: 50,
-            borderRadius: "50%",
-            objectFit: "cover",
-          }}
-        />
+        <h2 style={{ color: "white", fontSize: "30px" }}>JOHNVIDIA</h2>
       </Link>
 
       <SearchBar />
