@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { Typography, Box, Stack } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-import { Videos, Loader } from "./";
+import { Videos } from "./";
 import { fetchFromAPI } from "../utils/fetchFromApi";
 
 const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
   const [videos, setVideos] = useState(null);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const { id } = useParams();
+  const playerRef = useRef(null);
 
   useEffect(() => {
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`).then((data) =>
@@ -22,7 +24,19 @@ const VideoDetail = () => {
     );
   }, [id]);
 
-  if (!videoDetail?.snippet) return "Loading ...";
+  useEffect(() => {
+    // Update current video index when the videos change
+    setCurrentVideoIndex(0);
+  }, [videos]);
+
+  const handleVideoEnded = () => {
+    // Play next video when the current one ends
+    setCurrentVideoIndex((prevIndex) =>
+      prevIndex < videos.length - 1 ? prevIndex + 1 : 0
+    );
+  };
+
+  if (!videoDetail?.snippet) return <p>Loading</p>;
 
   const {
     snippet: { title, channelId, channelTitle },
@@ -35,9 +49,11 @@ const VideoDetail = () => {
         <Box flex={1}>
           <Box sx={{ width: "100%", position: "sticky", top: "86px" }}>
             <ReactPlayer
+              ref={playerRef}
               url={`https://www.youtube.com/watch?v=${id}`}
               className="react-player"
               controls
+              onEnded={handleVideoEnded}
             />
             <Typography color="#fff" variant="h5" fontWeight="bold" p={2}>
               {title}
